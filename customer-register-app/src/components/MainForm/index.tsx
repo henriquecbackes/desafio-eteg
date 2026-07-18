@@ -5,43 +5,44 @@ import Select, { type TColorOptions } from "../Select";
 import { useState } from "react";
 import { cpfValidator } from "cpf-cnpj-validator";
 import { toast } from "react-toastify";
+import { createRegister } from "../../services/api";
 
-const colorOptions: TColorOptions[] = [
-  { value: "red", label: "Vermelho", color: "#FF0000" },
-  { value: "orange", label: "Laranja", color: "#FF7F00" },
-  { value: "yellow", label: "Amarelo", color: "#FFFF00" },
-  { value: "green", label: "Verde", color: "#00FF00" },
-  { value: "blue", label: "Azul", color: "#0000FF" },
-  { value: "indigo", label: "Indigo", color: "#4B0082" },
-  { value: "violet", label: "Violeta", color: "#9400D3" },
+const corOptions: TColorOptions[] = [
+  { value: "vermelho", label: "Vermelho", color: "#FF0000" },
+  { value: "laranja", label: "Laranja", color: "#FF7F00" },
+  { value: "amarelo", label: "Amarelo", color: "#FFFF00" },
+  { value: "verde", label: "Verde", color: "#00FF00" },
+  { value: "azul", label: "Azul", color: "#0000FF" },
+  { value: "anil", label: "Indigo", color: "#4B0082" },
+  { value: "violeta", label: "Violeta", color: "#9400D3" },
 ];
 
 type TFormsErrors = {
-  name: string;
+  nome: string;
   cpf: string;
   email: string;
-  color: string;
-  observations: string;
+  cor: string;
+  observacoes: string;
 };
 
 export function MainForm() {
-  const [name, setName] = useState("");
+  const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
-  const [color, setColor] = useState("");
-  const [observations, setObservations] = useState("");
+  const [cor, setCor] = useState("");
+  const [observacoes, setObservacoes] = useState("");
   const [errors, setErrors] = useState<TFormsErrors>({
-    name: "",
+    nome: "",
     cpf: "",
     email: "",
-    color: "",
-    observations: "",
+    cor: "",
+    observacoes: "",
   });
 
-  const handleNameChange = (
+  const handleNomeChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => {
-    setName(e.target.value);
+    setNome(e.target.value);
   };
 
   const handleCpfChange = (
@@ -64,35 +65,35 @@ export function MainForm() {
     setEmail(e.target.value);
   };
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setColor(e.target.value);
+  const handleCorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCor(e.target.value);
   };
 
-  const handleObservationsChange = (
+  const handleObservacoesChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => {
-    setObservations(e.target.value);
+    setObservacoes(e.target.value);
   };
 
-  const validateName = () => {
-    const nameRegex = /^[A-Za-zá-úÁ-Ú]+(\s+[A-Za-zá-úÁ-Ú]+)+$/;
+  const validateNome = () => {
+    const nomeRegex = /^[A-Za-zá-úÁ-Ú]+(\s+[A-Za-zá-úÁ-Ú]+)+$/;
 
-    if (!name) {
+    if (!nome) {
       setErrors((prevState) => ({
         ...prevState,
-        name: "Campo obrigatório.",
+        nome: "Campo obrigatório.",
       }));
       return false;
-    } else if (!nameRegex.test(name)) {
+    } else if (!nomeRegex.test(nome)) {
       setErrors((prevState) => ({
         ...prevState,
-        name: "Insira um nome válido.",
+        nome: "Insira um nome válido.",
       }));
       return false;
     } else {
       setErrors((prevState) => ({
         ...prevState,
-        name: "",
+        nome: "",
       }));
     }
     return true;
@@ -144,32 +145,48 @@ export function MainForm() {
     return true;
   };
 
-  const validateColor = () => {
-    if (!color) {
+  const validateCor = () => {
+    if (!cor) {
       setErrors((prevState) => ({
         ...prevState,
-        color: "Campo obrigatório.",
+        cor: "Campo obrigatório.",
       }));
       return false;
     } else {
       setErrors((prevState) => ({
         ...prevState,
-        color: "",
+        cor: "",
       }));
     }
     return true;
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const isValidName = validateName();
+    const isValidNome = validateNome();
     const isValidCpf = validateCpf();
     const isValidEmail = validateEmail();
-    const isValidColor = validateColor();
+    const isValidCor = validateCor();
 
-    if (isValidName && isValidCpf && isValidEmail && isValidColor) {
-      toast.success("Valores cadastrados com sucesso!");
+    if (isValidNome && isValidCpf && isValidEmail && isValidCor) {
+      const data = {
+        nome,
+        cpf: cpf.replace(/\D/g, ""),
+        email,
+        cor,
+        observacoes,
+      };
+
+      try {
+        await createRegister(data);
+        toast.success("Valores cadastrados com sucesso!");
+      } catch (err) {
+        toast.error(
+          "Houve um erro no cadastro, por favor, tente novamente em alguns minutos.",
+        );
+        console.error(err);
+      }
     }
   };
 
@@ -178,14 +195,14 @@ export function MainForm() {
       <form onSubmit={handleSubmit} className={styles.form} action={""}>
         <div className={styles.formRow}>
           <Input
-            id="name"
-            value={name}
+            id="nome"
+            value={nome}
             type="text"
             placeholder="Digite seu nome"
             label="Nome Completo"
-            onChange={handleNameChange}
+            onChange={handleNomeChange}
           />
-          {errors.name && <p className={styles.error}>{errors.name}</p>}
+          {errors.nome && <p className={styles.error}>{errors.nome}</p>}
         </div>
         <div className={styles.formRow}>
           <Input
@@ -213,23 +230,23 @@ export function MainForm() {
         <div className={styles.formRow}>
           <Select
             title="Cor preferida:"
-            options={colorOptions}
-            onChange={handleColorChange}
-            value={color}
+            options={corOptions}
+            onChange={handleCorChange}
+            value={cor}
           />{" "}
-          {errors.color && <p className={styles.error}>{errors.color}</p>}
+          {errors.cor && <p className={styles.error}>{errors.cor}</p>}
         </div>
         <div className={styles.formRow}>
           <Input
-            id="observations"
-            value={observations}
+            id="observacoes"
+            value={observacoes}
             type="text"
             placeholder="Digite algo..."
             label="Observações"
-            onChange={handleObservationsChange}
+            onChange={handleObservacoesChange}
           />{" "}
-          {errors.observations && (
-            <p className={styles.error}>{errors.observations}</p>
+          {errors.observacoes && (
+            <p className={styles.error}>{errors.observacoes}</p>
           )}
         </div>
 
