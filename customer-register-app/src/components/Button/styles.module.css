@@ -1,0 +1,21 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  width: 100%;
+  background-color: #5464bb;
+  color: #e4e4e4;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.1s ease-in-out;
+  cursor: pointer;
+  margin-top: 25px;
+  font-size: 18px;
+}
+
+.button:hover {
+  filter: brightness(80%);
+}

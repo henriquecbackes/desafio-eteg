@@ -1,0 +1,19 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] 
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Cadastro {
+  id          String   @id @default(uuid())
+  nome        String
+  cpf         String   @unique
+  email       String   @unique
+  cor         String
+  observacoes String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
